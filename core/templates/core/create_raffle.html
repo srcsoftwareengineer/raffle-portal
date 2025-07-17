@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><title>Create Raffle</title></head>
+<body>
+    <h2>Create New Raffle</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Raffle</button>
+    </form>
+    <p><a href="{% url 'core:dashboard' %}">Back to Dashboard</a></p>
+</body>
+</html>

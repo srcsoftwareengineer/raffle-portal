@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+<head><title>See you again!</title></head>
+<body>
+    <h2>Logged out!</h2>
+    <p>Volte sempre, {{ request.user.username|default:"convidado" }} 😉</p>
+    <p><a href="{% url 'core:sign_in' %}">Log in again</a></p>
+</body>
+</html>
