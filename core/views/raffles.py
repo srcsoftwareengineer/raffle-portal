@@ -12,7 +12,9 @@ from django.contrib.auth.decorators import login_required
 from core.models.raffles import Raffle
 from core.models.tickets import Ticket
 from core.models.winners import WinnerNotification
+from core.forms.ticket_form import TicketPurchaseForm
 from core.forms import RaffleForm
+from django.contrib import messages
 
 
 @login_required
@@ -63,3 +65,27 @@ def publish_raffle(request, raffle_id):
 def list_raffles(request):
     raffles = Raffle.objects.filter(created_by=request.user)
     return render(request, "core/list_raffles.html", {"raffles": raffles})
+
+
+@login_required
+def purchase_tickets(request, raffle_id):
+    raffle = get_object_or_404(Raffle, id=raffle_id)
+
+    if request.method == "POST":
+        form = TicketPurchaseForm(request.POST, raffle=raffle)
+        if form.is_valid():
+            ticket_ids = form.cleaned_data["tickets"]
+            selected = Ticket.objects.filter(id__in=ticket_ids, buyer__isnull=True)
+            for ticket in selected:
+                ticket.buyer = request.user
+                ticket.save()
+            messages.success(
+                request, f"{len(selected)} ticket(s) successfully purchased."
+            )
+            return redirect("core:list_raffles")
+    else:
+        form = TicketPurchaseForm(raffle=raffle)
+
+    return render(
+        request, "core/purchase_tickets.html", {"raffle": raffle, "form": form}
+    )
