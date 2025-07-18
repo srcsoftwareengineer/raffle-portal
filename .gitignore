@@ -1,10 +1,52 @@
-venv/
+# Eclipse
+.project
+
+# PyDev
+.pydevproject
+
+#DevOps tools
+_devtools/
+
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+
+# Virtual Envs
 .env
 .env.*
+.venv
+env/
+venv/
+ENV/
+stormraffle-env/
+.storm_env/
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
 *.sqlite3
 db.sqlite3
+dev.db.raffles
+
+# VSCode
+.vscode/
+
+# Pytest
+.pytest_cache/
+
+# Migrations (optional if auto-generated)
+**/migrations/*.pyc
+**/migrations/*.pyo
+**/migrations/__pycache__/
+
+# Pyenv
+.python-version
+
+# System
 .DS_Store
-.idea/
-*.log
+Thumbs.db
+
+# Pre-commit cache
+.cache/

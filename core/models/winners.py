@@ -12,4 +12,3 @@ class WinnerNotification(models.Model):
 
     def __str__(self):
         return f"Winner for {self.raffle.title} is {self.winner.username}"
-

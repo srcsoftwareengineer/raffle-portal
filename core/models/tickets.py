@@ -7,5 +7,5 @@ class Ticket(models.Model):
     raffle = models.ForeignKey(Raffle, on_delete=models.PROTECT)
     buyer = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     number = models.PositiveIntegerField()
-    ticket_price = models.DecimalField(max_digits=10, decimal_places=2)
+    ticket_price = models.DecimalField(default=0.00, max_digits=10, decimal_places=2)
     payment_confirmed = models.BooleanField(default=False)

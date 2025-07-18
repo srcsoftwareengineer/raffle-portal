@@ -1,8 +1,8 @@
-'''
+"""
 Created on 15 de jul. de 2025
 
 @author: masterdev
-'''
+"""
 
 import random
 from django.shortcuts import render
@@ -17,7 +17,9 @@ from core.forms import RaffleForm
 
 @login_required
 def draw_raffle(request, raffle_id):
-    raffle = get_object_or_404(Raffle, id=raffle_id, created_by=request.user, status="published")
+    raffle = get_object_or_404(
+        Raffle, id=raffle_id, created_by=request.user, status="published"
+    )
     tickets = Ticket.objects.filter(raffle=raffle, payment_confirmed=True)
 
     if tickets.exists():
@@ -25,11 +27,12 @@ def draw_raffle(request, raffle_id):
         WinnerNotification.objects.create(raffle=raffle, winner=winner_ticket.buyer)
         raffle.status = "finished"
         raffle.save()
-    return redirect('core:list_raffles')
+    return redirect("core:list_raffles")
+
 
 @login_required
 def create_raffle(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = RaffleForm(request.POST)
         if form.is_valid():
             raffle = form.save(commit=False)
@@ -37,14 +40,13 @@ def create_raffle(request):
             raffle.save()
             for i in range(1, raffle.total_tickets + 1):
                 Ticket.objects.create(
-                    raffle=raffle,
-                    number=i,
-                    ticket_price=raffle.ticket_price
-                    )
-            return redirect('core:list_raffles')
+                    raffle=raffle, number=i, ticket_price=raffle.ticket_price
+                )
+            return redirect("core:list_raffles")
     else:
         form = RaffleForm()
-    return render(request, 'core/create_raffle.html', {'form': form})
+    return render(request, "core/create_raffle.html", {"form": form})
+
 
 @login_required
 def publish_raffle(request, raffle_id):
@@ -52,9 +54,10 @@ def publish_raffle(request, raffle_id):
     if raffle.status == "draft":
         raffle.status = "published"
         raffle.save()
-    return redirect('core:list_raffles')
+    return redirect("core:list_raffles")
+
 
 @login_required
 def list_raffles(request):
     raffles = Raffle.objects.filter(created_by=request.user)
-    return render(request, 'core/list_raffles.html', {'raffles': raffles})
+    return render(request, "core/list_raffles.html", {"raffles": raffles})
