@@ -1,11 +1,23 @@
 from django.db import models
 from django.contrib.auth.models import User
-from core.models.raffles import Raffle
+from .raffles import Raffle
 
 
 class Ticket(models.Model):
-    raffle = models.ForeignKey(Raffle, on_delete=models.PROTECT)
-    buyer = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    raffle = models.ForeignKey(Raffle, on_delete=models.CASCADE)
     number = models.PositiveIntegerField()
-    ticket_price = models.DecimalField(default=0.00, max_digits=10, decimal_places=2)
-    payment_confirmed = models.BooleanField(default=False)
+    buyer = models.ForeignKey(User, null=True, blank=True, on_delete=models.DO_NOTHING)
+    STATUS_CHOICES = [
+        ("available", "Available"),
+        ("reserved", "Reserved"),
+        ("sold", "Sold"),
+    ]
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="available"
+    )
+
+    class Meta:
+        ordering = ["number"]
+
+    def __str__(self):
+        return f"Ticket #{self.number} - {self.status}"

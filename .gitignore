@@ -37,6 +37,7 @@ dev.db.raffles
 .pytest_cache/
 
 # Migrations (optional if auto-generated)
+migrations/
 **/migrations/*.pyc
 **/migrations/*.pyo
 **/migrations/__pycache__/

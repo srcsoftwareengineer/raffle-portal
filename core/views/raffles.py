@@ -38,10 +38,12 @@ def create_raffle(request):
             raffle = form.save(commit=False)
             raffle.created_by = request.user
             raffle.save()
-            for i in range(1, raffle.total_tickets + 1):
-                Ticket.objects.create(
-                    raffle=raffle, number=i, ticket_price=raffle.ticket_price
-                )
+            Ticket.objects.bulk_create(
+                [
+                    Ticket(raffle=raffle, number=i, status="available")
+                    for i in range(1, raffle.total_tickets + 1)
+                ]
+            )
             return redirect("core:list_raffles")
     else:
         form = RaffleForm()
