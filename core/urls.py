@@ -1,3 +1,5 @@
+# core/urls.py
+
 """
 Created on 15 de jul. de 2025
 
@@ -28,4 +30,9 @@ urlpatterns = [
         name="publish_raffle",
     ),
     path("raffles/<int:raffle_id>/draw/", raffles.draw_raffle, name="draw_raffle"),
+    path(
+        "raffles/<int:raffle_id>/purchase/",
+        raffles.purchase_tickets,
+        name="purchase_tickets",
+    ),
 ]
