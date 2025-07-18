@@ -16,3 +16,7 @@ class RaffleForm(forms.ModelForm):
         widgets = {
             "draw_date": forms.DateInput(attrs={"type": "date"}),
         }
+
+
+class PurchaseTicketForm(forms.Form):
+    quantity = forms.IntegerField(min_value=1, label="Quantidade de Tickets")
