@@ -12,9 +12,9 @@ from django.contrib.auth.decorators import login_required
 from core.models.raffles import Raffle
 from core.models.tickets import Ticket
 from core.models.winners import WinnerNotification
-from core.forms.ticket_form import TicketPurchaseForm
-from core.forms import RaffleForm
+from core.app_forms.ticket_form import TicketPurchaseForm
 from django.contrib import messages
+from core.forms import RaffleForm
 
 
 @login_required
