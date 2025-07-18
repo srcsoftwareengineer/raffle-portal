@@ -1,0 +1,11 @@
+<!-- core/templates/core/purchase_tickets.html -->
+{% extends "core/dashboard.html" %}
+{% block content %}
+<h2>Purchase Tickets - Raffle {{ raffle.title }}</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Buy Tickets</button>
+</form>
+<a href="{% url 'core:list_raffles' %}">Back to list</a>
+{% endblock %}
