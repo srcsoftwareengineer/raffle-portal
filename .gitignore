@@ -8,3 +8,7 @@ db.sqlite3
 .DS_Store
 .idea/
 *.log
+.project
+.pydevproject
+dev.db.raffles
+.github/
