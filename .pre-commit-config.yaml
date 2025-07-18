@@ -1,0 +1,34 @@
+repos:
+  - repo: https://github.com/psf/black
+    rev: 25.1.0  # Última estável confirmada
+    hooks:
+      - id: black
+
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.10.0
+    hooks:
+      - id: shellcheck
+        #files: \.sh$
+        #additional_dependencies: [bash]  # Use only with docker-images
+        #files: ^.*\.sh$
+
+  #- repo: https://github.com/pre-commit/mirrors-flake8
+    #rev: v7.0.0
+    #hooks:
+      #- id: flake8
+
+  #- repo: https://github.com/pre-commit/mirrors-pytest
+    #rev: v7.4.4
+    #hooks:
+      #- id: pytest
+
+  #- repo: local
+    #hooks:
+      #- id: shellcheck-local
+        #name: shellcheck (local)
+        #entry: shellcheck
+        #language: system
+        #types: [shell, bash]
+        #files: \.sh$
+        #files: (^|/)\*.*
+        #files: (^|/)bin/.*\.sh$

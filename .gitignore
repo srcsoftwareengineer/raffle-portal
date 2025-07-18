@@ -53,5 +53,5 @@ Thumbs.db
 .cache/
 /_sprint_docs/
 /.pre-commit-config.yaml~
-/.pre-commit-config.yaml
 /.gitignore~
+**/*/*.py~
