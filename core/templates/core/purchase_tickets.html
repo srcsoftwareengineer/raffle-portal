@@ -1,11 +1,33 @@
-<!-- core/templates/core/purchase_tickets.html -->
-{% extends "core/dashboard.html" %}
-{% block content %}
-<h2>Purchase Tickets - Raffle {{ raffle.title }}</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Buy Tickets</button>
-</form>
-<a href="{% url 'core:list_raffles' %}">Back to list</a>
-{% endblock %}
+<html>
+	<head>
+	    <title>Purchase Tickets</title>
+	</head>
+	<body style="background-color:#330000 !important;text-align:center;color:#ffffff">
+		{% block content %}
+		<h2>Raffle {{ raffle.title }}<br />Purchase your tickets</h2>
+		<div>
+			<div>
+				{% if messages %}
+				<ul>
+				  {% for message in messages %}
+				    <li>{{ message }}</li>
+				  {% endfor %}
+				</ul>
+				{% endif %}
+				</div>
+			<div>
+				<form method="post">
+					{% csrf_token %}
+					{% if raffle.status == "published" %}
+					{{ form.as_p }}
+					{% endif %}
+					<button type="submit">Buy Tickets</button>
+				</form>
+			</div>
+			<div>
+				<a href="{% url 'core:list_raffles' %}">[ Back to list ]</a>
+			</div>
+		</div>
+		{% endblock %}
+	</body>
+</html>

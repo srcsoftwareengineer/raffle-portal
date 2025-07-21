@@ -6,10 +6,14 @@
 <body>
     <h2>Welcome, {{ request.user.username }}</h2>
     <p>This is your dashboard.</p>
-    <!-- <p><a href="{% url 'core:logout' %}">Logout</a></p> -->
-    <form action="{% url 'core:logout' %}" method="post" style="display:inline;">
+	<div style="margin-bottom: 13px;">
+		<a href="{% url 'core:list_raffles' %}">[ List Raffles ]</a>
+	</div>
+    <div>
+		<form action="{% url 'core:logout' %}" method="post" style="display:inline;">
         {% csrf_token %}
         <button type="submit">Logout</button>
-    </form>
+    	</form>
+	</div>
 </body>
 </html>

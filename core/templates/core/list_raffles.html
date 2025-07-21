@@ -3,22 +3,34 @@
 <head><title>My Raffles</title></head>
 <body>
     <h2>My Raffles</h2>
+	<div>
+	<div>
 	<ul>
 		{% for raffle in raffles %}
 		    <li>
-		        <strong>{{ raffle.title }}</strong> - Draw: {{ raffle.draw_date }} - Status: {{ raffle.status }}
+		        <strong>{{ raffle.title }}</strong>
+				<br />- Total of tickets: {{ raffle.total_tickets }}
+				<br />- Total availables: Not implemented
+				<br />- Tickect price: {{ raffle.ticket_price }}
+				<br />- Draw: {{ raffle.draw_date }}
+				<br />- Status: {{ raffle.status }}
 		        {% if raffle.status == "draft" %}
-		            <a href="{% url 'core:publish_raffle' raffle.id %}">[Publish]</a>
+		            <br /><a href="{% url 'core:publish_raffle' raffle.id %}">[ Publish ]</a>
 		        {% elif raffle.status == "published" %}
-		            <a href="{% url 'core:draw_raffle' raffle.id %}">[Run Draw]</a>
+		            <br /><a href="{% url 'core:purchase_tickets' raffle.id %}">[ Buy Tickets ]</a>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+					<a href="{% url 'core:draw_raffle' raffle.id %}">[ Run Draw ]</a>
 		        {% endif %}
 		    </li>
 		{% empty %}
 		    <li>No raffles created yet.</li>
 		{% endfor %}
 		</ul>
-    <p><a href="{% url 'core:create_raffle' %}">Create new raffle</a></p>
-    <p><a href="{% url 'core:dashboard' %}">Back to Dashboard</a></p>
+	</div>
+	<div>
+    <span><a href="{% url 'core:create_raffle' %}">[ Create new raffle ]</a></span>
+    <span><a href="{% url 'core:dashboard' %}">[ Back to Dashboard ]</a></span>
+	</div>
+	</div>
 </body>
 </html>
-
