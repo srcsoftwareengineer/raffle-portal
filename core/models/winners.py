@@ -4,6 +4,10 @@ from .raffles import Raffle
 
 
 class WinnerNotification(models.Model):
+    """
+    @summary: Create relational entity 'winners'
+    """
+
     raffle = models.OneToOneField(Raffle, on_delete=models.DO_NOTHING)
     winner = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     winner_date = models.DateTimeField(auto_now_add=True)
