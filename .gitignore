@@ -55,3 +55,4 @@ Thumbs.db
 /.pre-commit-config.yaml~
 /.gitignore~
 **/*/*.py~
+/_samples/
