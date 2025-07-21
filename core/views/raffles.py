@@ -15,6 +15,7 @@ from core.models.winners import WinnerNotification
 from core.app_forms.ticket_form import TicketPurchaseForm
 from django.contrib import messages
 from core.forms import RaffleForm
+from django.urls.base import reverse
 
 
 @login_required
@@ -82,10 +83,11 @@ def purchase_tickets(request, raffle_id):
             messages.success(
                 request, f"{len(selected)} ticket(s) successfully purchased."
             )
-            return redirect("core:list_raffles")
+        return redirect(
+            reverse("core:purchase_tickets", kwargs={"raffle_id": raffle.id})
+        )
     else:
         form = TicketPurchaseForm(raffle=raffle)
-
-    return render(
-        request, "core/purchase_tickets.html", {"raffle": raffle, "form": form}
-    )
+        return render(
+            request, "core/purchase_tickets.html", {"raffle": raffle, "form": form}
+        )
