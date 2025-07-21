@@ -6,6 +6,10 @@ from .raffles import Raffle
 
 
 class Ticket(models.Model):
+    """
+    @summary: Create relational entity 'tickets'
+    """
+
     raffle = models.ForeignKey(Raffle, on_delete=models.CASCADE, related_name="tickets")
     number = models.PositiveIntegerField()
     buyer = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
