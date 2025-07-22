@@ -12,7 +12,14 @@ class RaffleForm(forms.ModelForm):
 
     class Meta:
         model = Raffle
-        fields = ["title", "description", "draw_date", "ticket_price", "total_tickets"]
+        fields = [
+            "title",
+            "description",
+            "draw_date",
+            "ticket_price",
+            "total_tickets",
+            "status",
+        ]
         widgets = {
             "draw_date": forms.DateInput(attrs={"type": "date"}),
         }
