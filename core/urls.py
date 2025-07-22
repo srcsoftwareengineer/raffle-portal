@@ -14,6 +14,7 @@ app_name = "core"
 urlpatterns = [
     path("", include("django.contrib.auth.urls")),
     path("", auth.dashboard, name="dashboard"),
+    path("dashboard/", auth.dashboard, name="dashboard"),
     path(
         "sign-in/",
         auth_views.LoginView.as_view(template_name="registration/sign_in.html"),
