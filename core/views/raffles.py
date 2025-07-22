@@ -32,9 +32,6 @@ def list_raffles(request):
 
 @login_required
 def draw_raffle(request, raffle_id):
-    # raffle = get_object_or_404(
-    #     Raffle, id=raffle_id, created_by=request.user, status="published"
-    # )
     raffle = get_object_or_404(Raffle, id=raffle_id, created_by=request.user)
     tickets = Ticket.objects.filter(raffle=raffle, payment_confirmed=True)
 
