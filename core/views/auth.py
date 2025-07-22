@@ -15,8 +15,8 @@ def register(request):
     """
     @todo: Add attributes mobile_prefix and mobile_number
 
-    @note: This the mobile_prefix and the last 4 digits of the mobile number will be displayed for public information
-            W.app message will be sent manually
+    @note: This the mobile_prefix and the last 4 digits of the mobile number will be
+            displayed for public information W.app message will be sent manually
     """
     if request.method == "POST":
         form = UserCreationForm(request.POST)
@@ -36,4 +36,4 @@ def dashboard(request):
 
 def force_logout(request):
     logout(request)
-    return redirect("registration:logged_out")
+    return redirect("core:logout")

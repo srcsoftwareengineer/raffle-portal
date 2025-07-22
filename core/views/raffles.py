@@ -88,7 +88,8 @@ def purchase_tickets(request, raffle_id):
                 request, f"{len(selected)} ticket(s) successfully purchased."
             )
         return redirect(
-            reverse("core:purchase_tickets", kwargs={"raffle_id": raffle.id})
+            # reverse("core:purchase_tickets", kwargs={"raffle_id": raffle.id})
+            reverse("core:purchase_confirmation", kwargs={"raffle_id": raffle.id})
         )
     else:
         form = TicketPurchaseForm(raffle=raffle)

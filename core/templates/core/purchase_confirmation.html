@@ -1,0 +1,8 @@
+{% extends 'core/purchase_tickets.html' %}
+{% block content %}
+<body style="font-family:Sans">
+  <h2>✅ Purchase Confirmed!</h2>
+  <p>Your ticket(s) were successfully purchased.</p>
+  <a href="{% url 'core:list_raffles' %}">[ Back to Raffle List ]</a>
+</body>
+{% endblock %}
