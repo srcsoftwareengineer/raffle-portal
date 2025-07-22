@@ -19,10 +19,23 @@ from django.urls.base import reverse
 
 
 @login_required
+def list_raffles(request):
+    available_tickets: dict = {}
+    user_raffles = Raffle.objects.filter(created_by=request.user)
+    for raffle in user_raffles:
+        tickets = Ticket.objects.filter(raffle=raffle.id, buyer__isnull=True).count()
+        available_tickets.update(
+            {"raffles": user_raffles, "available_tickets": tickets}
+        )
+    return render(request, "core/list_raffles.html", available_tickets)
+
+
+@login_required
 def draw_raffle(request, raffle_id):
-    raffle = get_object_or_404(
-        Raffle, id=raffle_id, created_by=request.user, status="published"
-    )
+    # raffle = get_object_or_404(
+    #     Raffle, id=raffle_id, created_by=request.user, status="published"
+    # )
+    raffle = get_object_or_404(Raffle, id=raffle_id, created_by=request.user)
     tickets = Ticket.objects.filter(raffle=raffle, payment_confirmed=True)
 
     if tickets.exists():
@@ -60,12 +73,6 @@ def publish_raffle(request, raffle_id):
         raffle.status = "published"
         raffle.save()
     return redirect("core:list_raffles")
-
-
-@login_required
-def list_raffles(request):
-    raffles = Raffle.objects.filter(created_by=request.user)
-    return render(request, "core/list_raffles.html", {"raffles": raffles})
 
 
 @login_required
