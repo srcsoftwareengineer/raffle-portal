@@ -1,29 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head><title>My Raffles</title></head>
-<body>
+<body style="font-family:Sans">
     <h2>My Raffles</h2>
 	<div>
 	<div>
-	<ul>
-		{% for raffle in raffles %}
-		    <li>
-		        <strong>{{ raffle.title }}</strong>
-				<br />- Total of tickets: {{ raffle.total_tickets }}
-				<br />- Total availables: Not implemented
-				<br />- Tickect price: {{ raffle.ticket_price }}
-				<br />- Draw: {{ raffle.draw_date }}
-				<br />- Status: {{ raffle.status }}
-		        {% if raffle.status == "draft" %}
-		            <br /><a href="{% url 'core:publish_raffle' raffle.id %}">[ Publish ]</a>
-		        {% elif raffle.status == "published" %}
-		            <br /><a href="{% url 'core:purchase_tickets' raffle.id %}">[ Buy Tickets ]</a>
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-					<a href="{% url 'core:draw_raffle' raffle.id %}">[ Run Draw ]</a>
-		        {% endif %}
-		    </li>
+		<ul>
+		{% for item in raffles_with_tickets %}
+		<li>
+		<strong>{{ item.raffle.title }}</strong>
+		    <br />- Total of tickets: {{ item.raffle.total_tickets }}
+		    <br />- Availables tickets: {{ item.available_tickets }}
+		    <br />- Tickect price: {{ item.raffle.ticket_price }}
+		    <br />- Draw: {{ item.raffle.draw_date }}
+		    <br />- Status: {{ item.raffle.status }}
+		    {% if item.raffle.status == "draft" %}
+		        <br /><a href="{% url 'core:publish_raffle' item.raffle.id %}">[ Publish ]</a>
+		    {% elif item.raffle.status == "published" %}
+		    <br />
+		    <a href="{% url 'core:purchase_tickets' item.raffle.id %}">[ Buy Tickets ]</a>
+		    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+		    <a href="{% url 'core:draw_raffle' item.raffle.id %}">[ Run Draw ]</a>
+		{% endif %}
+		</li>
 		{% empty %}
-		    <li>No raffles created yet.</li>
+		<li>No raffles created yet.</li>
 		{% endfor %}
 		</ul>
 	</div>
