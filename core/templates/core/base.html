@@ -1,0 +1,23 @@
+<!-- core/templates/base.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Storm Raffle Portal{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <h1>Storm Raffle Portal</h1>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- Conteúdo específico da view -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 - Storm Raffles</p>
+    </footer>
+</body>
+</html>

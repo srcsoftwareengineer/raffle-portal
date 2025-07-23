@@ -26,7 +26,6 @@ urlpatterns = [
         auth_views.LogoutView.as_view(template_name="registration/logged_out.html"),
         name="logout",
     ),
-    # path("logged_out/", auth.force_logout, name="logged_out"),
     path("raffles/create/", raffles.create_raffle, name="create_raffle"),
     path("raffles/", raffles.list_raffles, name="list_raffles"),
     path("my-raffles/", user_raffles.list_raffles, name="list_raffles"),
@@ -45,5 +44,10 @@ urlpatterns = [
         "checkout/purchase_confirmation/<int:raffle_id>/",
         checkout.purchase_confirmation,
         name="purchase_confirmation",
+    ),
+    path(
+        "raffles/draw/<int:raffle_id>/",
+        raffles.draw_winner_display,
+        name="draw_winner_display",
     ),
 ]

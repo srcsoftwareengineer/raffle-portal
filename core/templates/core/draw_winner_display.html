@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h2>Raffle: {{ raffle.title }}</h2>
+
+{% if error %}
+<p style="color: red;">{{ error }}</p>
+<a href="{% url 'core:list_raffles' %}">[ Back to list ]</a>
+
+{% elif winner %}
+<p>🎉 Ticket <strong>{{ winner.number }}</strong> is the WINNER!</p>
+<p>Drawn at: {{ raffle.drawn_at }}</p>
+<a href="{% url 'core:list_raffles' %}">[ Back to list ]</a>
+
+{% else %}
+<p>Processing draw...</p>
+{% endif %}
+{% endblock %}

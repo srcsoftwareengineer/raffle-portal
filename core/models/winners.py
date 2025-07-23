@@ -1,6 +1,8 @@
+# core/models/winners.py
+
 from django.db import models
-from django.contrib.auth.models import User
-from .raffles import Raffle
+from core.models.raffles import Raffle
+from core.models.tickets import Ticket
 
 
 class WinnerNotification(models.Model):
@@ -9,8 +11,24 @@ class WinnerNotification(models.Model):
     """
 
     raffle = models.OneToOneField(Raffle, on_delete=models.DO_NOTHING)
-    winner = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    winner_date = models.DateTimeField(auto_now_add=True)
+    drawn_ticket = models.OneToOneField(Ticket, on_delete=models.DO_NOTHING)
+    wapp_sent = models.BooleanField(default=False)
+    wapp_sent_by = models.CharField(
+        max_length=10,
+        choices=[("System", "System"), ("User", "User")],
+        null=True,
+        blank=True,
+        help_text="Indica se o envio foi manual ou automático",
+    )
+
+    @property
+    def winner(self):
+        return self.drawn_ticket.buyer
 
     def __str__(self):
-        return f"Winner of {self.raffle.title}: {self.winner.username}"
+        buyer = (
+            self.drawn_ticket.buyer.username
+            if self.drawn_ticket.buyer
+            else "(sem comprador)"
+        )
+        return f"🏆 {buyer} venceu a rifa '{self.raffle.title}'"

@@ -8,7 +8,7 @@ import random
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from core.models.raffles import Raffle
 from core.models.tickets import Ticket
 from core.models.winners import WinnerNotification
@@ -16,6 +16,12 @@ from core.app_forms.ticket_form import TicketPurchaseForm
 from django.contrib import messages
 from core.forms import RaffleForm
 from django.urls.base import reverse
+from django.utils import timezone
+from django.http.response import HttpResponse
+
+
+def is_admin(user):
+    return user.is_superuser or user.is_staff
 
 
 @login_required
@@ -31,16 +37,73 @@ def list_raffles(request):
 
 
 @login_required
+@user_passes_test(is_admin)
 def draw_raffle(request, raffle_id):
-    raffle = get_object_or_404(Raffle, id=raffle_id, created_by=request.user)
-    tickets = Ticket.objects.filter(raffle=raffle, payment_confirmed=True)
+    raffle = get_object_or_404(Raffle, id=raffle_id)
+    tickets = Ticket.objects.filter(
+        raffle=raffle, payment_confirmed=True, buyer__isnull=False
+    )
 
-    if tickets.exists():
-        winner_ticket = random.choice(tickets)
-        WinnerNotification.objects.create(raffle=raffle, winner=winner_ticket.buyer)
-        raffle.status = "finished"
-        raffle.save()
+    if raffle.drawn_ticket:
+        messages.warning(request, "Rifa já sorteada anteriormente.")
+        return redirect("core:list_raffles")
+
+    if not tickets.exists():
+        messages.error(request, "Não há bilhetes pagos para realizar o sorteio.")
+        return redirect("core:list_raffles")
+
+    if raffle.status != "published":
+        return redirect("core:list_raffles")
+
+    # Segurança: só o criador da rifa pode sortear
+    if raffle.created_by != request.user:
+        return redirect("core:list_raffles")
+
+    # Evita múltiplos sorteios
+    if raffle.drawn_at is not None:
+        return render(
+            request,
+            "core/draw_winner.html",
+            {"raffle": raffle, "winner": raffle.drawn_ticket},
+        )
+
+    # Sorteia e salva
+    drawn_ticket = random.choice(list(tickets))
+    raffle.drawn_at = timezone.now()
+    raffle.save()
+
+    # Após sortear o ticket vencedor
+    WinnerNotification.objects.update_or_create(
+        raffle=raffle, defaults={"drawn_ticket": drawn_ticket, "wapp_sent_by": "User"}
+    )
+    # Desative a compra de tickets duplicados (opcional)
+    # Ticket.objects.filter(raffle=raffle, buyer=raffle.drawn_ticket.buyer).exclude(
+    #     id=raffle.drawn_ticket.id
+    # ).update(is_reserved=True)
+
+    messages.success(
+        request, f"🎉 Ticket {drawn_ticket.number} venceu a rifa '{raffle.title}'!"
+    )
     return redirect("core:list_raffles")
+
+
+@login_required
+def draw_winner_display(request, raffle_id):
+    raffle = get_object_or_404(Raffle, id=raffle_id)
+
+    try:
+        winner_notification = WinnerNotification.objects.get(raffle=raffle)
+    except WinnerNotification.DoesNotExist:
+        return HttpResponse("Winner not found.", status=404)
+
+    return render(
+        request,
+        "core/draw_winner_display.html",
+        {
+            "raffle": raffle,
+            "winner_ticket": winner_notification.drawn_ticket,
+        },
+    )
 
 
 @login_required
@@ -88,7 +151,6 @@ def purchase_tickets(request, raffle_id):
                 request, f"{len(selected)} ticket(s) successfully purchased."
             )
         return redirect(
-            # reverse("core:purchase_tickets", kwargs={"raffle_id": raffle.id})
             reverse("core:purchase_confirmation", kwargs={"raffle_id": raffle.id})
         )
     else:

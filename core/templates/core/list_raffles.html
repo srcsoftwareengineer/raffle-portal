@@ -14,14 +14,20 @@
 		    <br />- Tickect price: {{ item.raffle.ticket_price }}
 		    <br />- Draw: {{ item.raffle.draw_date }}
 		    <br />- Status: {{ item.raffle.status }}
-		    {% if item.raffle.status == "draft" %}
+			{% if item.raffle.status == "draft" %}
 		        <br /><a href="{% url 'core:publish_raffle' item.raffle.id %}">[ Publish ]</a>
-		    {% elif item.raffle.status == "published" %}
-		    <br />
-		    <a href="{% url 'core:purchase_tickets' item.raffle.id %}">[ Buy Tickets ]</a>
-		    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-		    <a href="{% url 'core:draw_raffle' item.raffle.id %}">[ Run Draw ]</a>
-		{% endif %}
+		    	{% elif item.raffle.status == "published" %}
+					{% with winner=item.raffle.winnernotification.winner %}
+				    	{% if winner %}
+							<a href="{% url 'core:draw_winner_display' item.raffle.id %}">[ Show Winner ]</a>
+				        	<p>🎉 Vencedor: {{ winner.username }} (Ticket {{ item.raffle.winnernotification.drawn_ticket.number }})</p>
+				    	{% endif %}
+					{% endwith %}
+			    	<br />
+			    	<a href="{% url 'core:purchase_tickets' item.raffle.id %}">[ Buy Tickets ]</a>
+		    	 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		    		<a href="{% url 'core:draw_raffle' item.raffle.id %}">[ Run Draw ]</a>
+			{% endif %}
 		</li>
 		{% empty %}
 		<li>No raffles created yet.</li>

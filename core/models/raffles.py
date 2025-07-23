@@ -18,10 +18,14 @@ class Raffle(models.Model):
     total_tickets = models.PositiveIntegerField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="draft")
     create_date = models.DateField(auto_now_add=True)
-    drawn_at = models.DateTimeField(null=True, blank=True)  # Hora real do sorteio
+    drawn_at = models.DateTimeField(null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    winner = models.ForeignKey(
-        "core.Ticket", null=True, blank=True, on_delete=models.SET_NULL
+    drawn_ticket = models.OneToOneField(
+        "core.Ticket",
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+        related_name="won_raffle",
     )
 
     def __str__(self):
