@@ -7,14 +7,17 @@ Created on 15 de jul. de 2025
 
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from core.views import auth, raffles, user_raffles, checkout
+from core.views import auth, raffles, user_raffles, checkout, pages
 
 app_name = "core"
 
 urlpatterns = [
-    path("", include("django.contrib.auth.urls")),
-    path("", auth.dashboard, name="dashboard"),
-    path("dashboard/", auth.dashboard, name="dashboard"),
+    path(
+        "accounts/",
+        include(("django.contrib.auth.urls", "auth"), namespace="registration"),
+    ),
+    path("", pages.index, name="index"),  # ⬅️ rota raiz
+    path("dashboard/", raffles.dashboard, name="dashboard"),
     path(
         "sign-in/",
         auth_views.LoginView.as_view(template_name="registration/sign_in.html"),
@@ -22,13 +25,13 @@ urlpatterns = [
     ),
     path("sign-up/", auth.register, name="sign_up"),
     path(
-        "logout/",
-        auth_views.LogoutView.as_view(template_name="registration/logged_out.html"),
-        name="logout",
+        "logged_out/",
+        auth.logout_view,
+        name="logged_out",
     ),
     path("raffles/create/", raffles.create_raffle, name="create_raffle"),
     path("raffles/", raffles.list_raffles, name="list_raffles"),
-    path("my-raffles/", user_raffles.list_raffles, name="list_raffles"),
+    path("my-raffles/", user_raffles.list_user_raffles, name="list_user_raffles"),
     path(
         "raffles/<int:raffle_id>/publish/",
         raffles.publish_raffle,

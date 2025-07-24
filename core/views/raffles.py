@@ -20,20 +20,37 @@ from django.utils import timezone
 from django.http.response import HttpResponse
 
 
+def is_superadmin(user):
+    return user.is_superuser or user.groups.filter(name="super-admin").exists()
+
+
 def is_admin(user):
     return user.is_superuser or user.is_staff
 
 
 @login_required
+def dashboard(request):
+    return render(request, "core/dashboard.html")
+
+
+@user_passes_test(is_superadmin, login_url="core:unauthorized")
+@login_required
 def list_raffles(request):
     available_tickets: dict = {}
-    user_raffles = Raffle.objects.filter(created_by=request.user)
+    user_raffles = Raffle.objects.all()  # List the raffles created by all users
     for raffle in user_raffles:
         tickets = Ticket.objects.filter(raffle=raffle.id, buyer__isnull=True).count()
         available_tickets.update(
             {"raffles": user_raffles, "available_tickets": tickets}
         )
     return render(request, "core/list_raffles.html", available_tickets)
+
+
+# @login_required
+# def list_raffles(request):
+#     print("⚠️ Entrando em list_raffles view!")  # ou use logging
+#     raffles = Raffle.objects.all()
+#     return render(request, "core/list_raffles.html", {"raffles": raffles})
 
 
 @login_required
@@ -116,7 +133,7 @@ def create_raffle(request):
             raffle.save()
             Ticket.objects.bulk_create(
                 [
-                    Ticket(raffle=raffle, number=i, status="available")
+                    Ticket(raffle=raffle, number=i)
                     for i in range(1, raffle.total_tickets + 1)
                 ]
             )
