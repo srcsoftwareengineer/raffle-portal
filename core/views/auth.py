@@ -8,7 +8,6 @@ from django.shortcuts import render
 from django.shortcuts import redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
 
 
 def register(request):
@@ -29,11 +28,6 @@ def register(request):
     return render(request, "registration/sign_up.html", {"form": form})
 
 
-@login_required
-def dashboard(request):
-    return render(request, "core/dashboard.html")
-
-
-def force_logout(request):
+def logout_view(request):
     logout(request)
-    return redirect("core:logout")
+    return render(request, "core/logged_out.html")
