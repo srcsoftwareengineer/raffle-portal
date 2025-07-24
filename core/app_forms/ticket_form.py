@@ -46,4 +46,3 @@ class TicketPurchaseForm(forms.Form):
         super().__init__(*args, **kwargs)
         if raffle:
             self.get_available_tickets(raffle)
-        return
