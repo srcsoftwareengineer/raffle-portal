@@ -1,43 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head><title>My Raffles</title></head>
-<body style="font-family:Sans">
-    <h2>My Raffles</h2>
-	<div>
-	<div>
-		<ul>
-		{% for item in raffles_with_tickets %}
-		<li>
-		<strong>{{ item.raffle.title }}</strong>
-		    <br />- Total of tickets: {{ item.raffle.total_tickets }}
-		    <br />- Availables tickets: {{ item.available_tickets }}
-		    <br />- Tickect price: {{ item.raffle.ticket_price }}
-		    <br />- Draw: {{ item.raffle.draw_date }}
-		    <br />- Status: {{ item.raffle.status }}
-			{% if item.raffle.status == "draft" %}
-		        <br /><a href="{% url 'core:publish_raffle' item.raffle.id %}">[ Publish ]</a>
-		    	{% elif item.raffle.status == "published" %}
-					{% with winner=item.raffle.winnernotification.winner %}
-				    	{% if winner %}
-							<a href="{% url 'core:draw_winner_display' item.raffle.id %}">[ Show Winner ]</a>
-				        	<p>🎉 Vencedor: {{ winner.username }} (Ticket {{ item.raffle.winnernotification.drawn_ticket.number }})</p>
-				    	{% endif %}
-					{% endwith %}
-			    	<br />
-			    	<a href="{% url 'core:purchase_tickets' item.raffle.id %}">[ Buy Tickets ]</a>
-		    	 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		    		<a href="{% url 'core:draw_raffle' item.raffle.id %}">[ Run Draw ]</a>
-			{% endif %}
-		</li>
-		{% empty %}
-		<li>No raffles created yet.</li>
-		{% endfor %}
-		</ul>
-	</div>
-	<div>
-    <span><a href="{% url 'core:create_raffle' %}">[ Create new raffle ]</a></span>
-    <span><a href="{% url 'core:dashboard' %}">[ Back to Dashboard ]</a></span>
-	</div>
-	</div>
-</body>
-</html>
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="text-center mb-4">
+  <h2 class="text-primary">🎯 Rifas Disponíveis</h2>
+  <p class="text-muted">Participe de rifas incríveis e concorra a prêmios!</p>
+</div>
+
+<div class="row">
+  {% for raffle in raffles %}
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card h-100 border-success shadow">
+        <div class="card-body">
+          <h5 class="card-title text-success">{{ raffle.title }}</h5>
+          <p class="card-text">{{ raffle.description|truncatechars:100 }}</p>
+          <ul class="list-group list-group-flush mb-2">
+            <li class="list-group-item">🎟️ Tickets: {{ raffle.total_tickets }}</li>
+            <li class="list-group-item">💰 Preço: R$ {{ raffle.ticket_price }}</li>
+            <li class="list-group-item">📅 Sorteio: {{ raffle.draw_date|date:"d/m/Y" }}</li>
+          </ul>
+          <div class="d-grid gap-2">
+            <a href="{% url 'core:purchase_tickets' raffle.id %}" class="btn btn-outline-success">Participar</a>
+            {% if user.is_staff %}
+              <a href="{% url 'core:draw_raffle' raffle.id %}" class="btn btn-outline-warning">Sortear</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12">
+      <div class="alert alert-info text-center">
+        Nenhuma rifa disponível no momento. Tente novamente mais tarde.
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
