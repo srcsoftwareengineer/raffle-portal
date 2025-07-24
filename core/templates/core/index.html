@@ -1,0 +1,15 @@
+<!-- core/templates/core/index.html -->
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+  <h1 class="display-4">🎟️ Bem-vindo ao Storm Raffle Portal</h1>
+  <p class="lead">Participe, torça e ganhe. Aqui a sorte é sua aliada!</p>
+  <hr class="my-4">
+  {% if user.is_authenticated %}
+    <a class="btn btn-success btn-lg" href="{% url 'core:dashboard' %}">Acessar Painel</a>
+  {% else %}
+    <a class="btn btn-primary btn-lg" href="{% url 'core:sign_in' %}">Entrar</a>
+  {% endif %}
+</div>
+{% endblock %}

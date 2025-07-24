@@ -1,0 +1,9 @@
+{% extends 'core/base.html' %}
+{% block content %}
+  <div class="alert alert-danger mt-5" role="alert">
+    <h4 class="alert-heading">Acesso negado!</h4>
+    <p>Você não tem permissão para acessar essa área.</p>
+    <hr>
+    <a href="{% url 'core:dashboard' %}" class="btn btn-primary">Voltar ao Dashboard</a>
+  </div>
+{% endblock %}
