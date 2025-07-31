@@ -1,8 +1,8 @@
-'''
+"""
 Created on 24 de jul. de 2025
 
 @author: masterdev
-'''
+"""
 
 from django.db import models
 from django.contrib.auth.models import User
