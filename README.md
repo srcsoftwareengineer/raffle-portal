@@ -1,8 +1,7 @@
-# 🎸 StormRaffle – Portal de Rifas Online
+# Tô Rifando – Portal de Rifas Online [![GitHub Release](https://img.shields.io/github/v/release/srcsoftwareengineer/raffle-portal?label=Release&style=flat-square)](https://github.com/srcsoftwareengineer/raffle-portal/releases/latest)
 
 > Versão: **MVP 0.1 - Locked in Adamantium**  
-> Data de Lançamento: `25/07/2025`
-
+> Data de Lançamento: `27/07/2025`
 ---
 
 ## 🌪️ Visão Geral
