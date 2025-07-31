@@ -6,8 +6,6 @@
 
 ## [v0.1.0] - 2025-07-31
 
-🎯 Initial MVP completed after a focused 13-day sprint.
-
 ### Added
 - Public listing of raffles (unauthenticated access)
 - User auth: sign-up, login, logout
