@@ -1,17 +1,23 @@
 {% extends 'core/base.html' %}
+
 {% block content %}
-<h2>Raffle: {{ raffle.title }}</h2>
-
-{% if error %}
-<p style="color: red;">{{ error }}</p>
-<a href="{% url 'core:list_raffles' %}">[ Back to list ]</a>
-
-{% elif winner %}
-<p>🎉 Ticket <strong>{{ winner.number }}</strong> is the WINNER!</p>
-<p>Drawn at: {{ raffle.drawn_at }}</p>
-<a href="{% url 'core:list_raffles' %}">[ Back to list ]</a>
-
-{% else %}
-<p>Processing draw...</p>
-{% endif %}
+  <div class="container mt-5">
+    <div class="card text-center shadow-sm border-success">
+      <div class="card-header bg-success text-white">
+        🎉 Resultado do Sorteio
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">Rifa: {{ raffle.title }}</h3>
+        <p class="card-text">Parabéns ao vencedor!</p>
+        <div class="display-4 text-success mb-4">
+          Número Sorteado: {{ winner_ticket.number }}
+        </div>
+        <p class="text-muted">Comprado por: {{ winner_ticket.buyer.username }}</p>
+        <a href="{% url 'core:list_raffles' %}" class="btn btn-outline-primary">Ver Rifas</a>
+      </div>
+      <div class="card-footer text-muted">
+        Sorteado em: {{ raffle.drawn_at|date:"d/m/Y H:i" }}
+      </div>
+    </div>
+  </div>
 {% endblock %}

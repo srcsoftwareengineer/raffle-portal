@@ -1,0 +1,48 @@
+{% extends 'core/base.html' %}
+{% load widget_tweaks %}
+{% include 'core/dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+
+  <!-- MINHAS RIFAS COMPRADAS -->
+  <h2 class="text-primary">🎟️ Rifas Compradas</h2>
+  {% if bought_raffles %}
+    <div class="row">
+      {% for raffle in bought_raffles %}
+        <div class="col-md-4">
+          <div class="card mb-4 shadow-sm border-success">
+            <div class="card-body">
+              <h5 class="card-title">{{ raffle.title }}</h5>
+              <p class="card-text">{{ raffle.description|truncatewords:15 }}</p>
+              <a href="{% url 'core:show_single_raffle' raffle.id %}" class="btn btn-outline-success btn-sm">Ver Rifa</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">Você ainda não participou de nenhuma rifa.</div>
+  {% endif %}
+
+  <!-- TODAS AS RIFAS DISPONÍVEIS (PÚBLICAS) -->
+  <h2 class="text-primary mt-5">🌐 Rifas Disponíveis</h2>
+  {% if public_raffles %}
+    <div class="row">
+      {% for raffle in public_raffles %}
+        <div class="col-md-4">
+          <div class="card mb-4 shadow-sm border-primary">
+            <div class="card-body">
+              <h5 class="card-title">{{ raffle.title }}</h5>
+              <p class="card-text">{{ raffle.description|truncatewords:15 }}</p>
+              <a href="{% url 'core:purchase_tickets' raffle.id %}" class="btn btn-outline-primary btn-sm">Participar</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-warning">Nenhuma rifa pública está disponível no momento.</div>
+  {% endif %}
+
+</div>
+{% endblock %}

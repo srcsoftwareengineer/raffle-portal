@@ -1,15 +1,42 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Sign Up</title>
-</head>
-<body style="font-family:Sans">
-    <h2>Sign Up</h2>
-    <div><div><form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Register</button>
-    </form></div>
-    <div>Already have an account? <a href="{% url 'core:sign_in' %}">Login</a></div></div>
-</body>
-</html>
+{% extends 'core/base.html' %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card shadow">
+          <div class="card-body">
+            <h3 class="card-title text-center mb-4">Criar Conta</h3>
+            <form method="post" novalidate>
+              {% csrf_token %}
+              {% if form.non_field_errors %}
+				  <div class="alert alert-danger" role="alert">
+					{% for error in form.non_field_errors %}
+					  {{ error }}
+					{% endfor %}
+				  </div>
+				{% endif %}
+              {% for field in form %}
+                <div class="form-group mb-3">
+                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  {{ field }}
+                  {% if field.help_text %}
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                  {% endif %}
+                  {% for error in field.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              {% endfor %}
+              <button type="submit" class="btn btn-primary w-100">Cadastrar</button>
+            </form>
+            <hr>
+            <p class="text-center">Já possui conta?
+              <a href="{% url 'core:sign_in' %}" class="text-decoration-none">Entrar</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

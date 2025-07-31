@@ -1,13 +1,101 @@
-<!DOCTYPE html>
-<html>
-<head><title>Create Raffle</title></head>
-<body style="font-family:Sans">
-    <h2>Create New Raffle</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save Raffle</button>
-    </form>
-    <p><a href="{% url 'core:dashboard' %}">Back to Dashboard</a></p>
-</body>
-</html>
+{% extends 'core/base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<style>
+    #dropzone {
+      cursor: pointer;
+      background-color: #f8f9fa;
+    }
+    #dropzone.dragover {
+      background-color: #e0f7fa;
+      border-color: #007bff;
+    }
+    #preview img {
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+</style>
+  <div class="container mt-5">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="card-title mb-4">Criar Nova Rifa</h2>
+        <form method="post" enctype="multipart/form-data" novalidate>
+          {% csrf_token %}
+			<div class="form-group">
+			  <label for="{{ form.title.id_for_label }}">Título</label>
+			  {{ form.title|add_class:"form-control" }}
+			</div>
+			<div class="form-group">
+			  <label for="{{ form.description.id_for_label }}">Descrição</label>
+			  {{ form.description|add_class:"form-control" }}
+			</div>
+			  <div class="form-group">
+			    <label for="{{ form.draw_date.id_for_label }}">Data do Sorteio</label>
+			    {{ form.draw_date|add_class:"form-control" }}
+			  </div>
+			<div class="form-group">
+			  <label for="{{ form.ticket_price.id_for_label }}">Preço por n&uacute;mero</label>
+			  {{ form.ticket_price|add_class:"form-control" }}
+			</div>
+			  <div class="form-group">
+			    <label for="{{ form.total_tickets.id_for_label }}">Quantidade de n&uacute;meros</label>
+			    {{ form.total_tickets|add_class:"form-control" }}
+			  </div>
+			<div class="form-group">
+			  <label for="{{ form.status.id_for_label }}">Status</label>
+			  {{ form.status|add_class:"form-control" }}
+			</div>
+			<div class="form-group">
+	            <label for="imageUpload">Imagens da Rifa (máx. 4):</label>
+	            <div id="dropzone" class="border border-primary p-3 text-center rounded">
+	              <p>Arraste e solte as imagens aqui ou clique para selecionar</p>
+	              <input type="file" id="imageUpload" name="images" accept="image/*" multiple style="display: none;">
+	              <div id="preview" class="d-flex flex-wrap mt-3 gap-2"></div>
+	            </div>
+	        </div>
+			<div class="mt-5 mb-3">
+	          <button type="submit" class="btn btn-success">Criar Rifa</button>
+	          <a href="{% url 'core:dashboard' %}" class="btn btn-secondary ml-2">Cancelar</a>
+		  	</div>
+        </form>
+      </div>
+    </div>
+  </div>
+    <script>
+      const dropzone = document.getElementById('dropzone');
+      const fileInput = document.getElementById('imageUpload');
+      const preview = document.getElementById('preview');
+
+      dropzone.addEventListener('click', () => fileInput.click());
+      dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+      });
+      dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('dragover');
+      });
+      dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        fileInput.files = files;
+        handlePreview(files);
+      });
+      fileInput.addEventListener('change', () => handlePreview(fileInput.files));
+
+      function handlePreview(files) {
+        preview.innerHTML = '';
+        Array.from(files).slice(0, 4).forEach(file => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.classList.add('mr-2');
+            preview.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+    </script>
+{% endblock %}

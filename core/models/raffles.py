@@ -19,7 +19,7 @@ class Raffle(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="draft")
     create_date = models.DateField(auto_now_add=True)
     drawn_at = models.DateTimeField(null=True, blank=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     drawn_ticket = models.OneToOneField(
         "core.Ticket",
         on_delete=models.DO_NOTHING,

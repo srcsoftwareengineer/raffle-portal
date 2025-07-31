@@ -1,8 +1,70 @@
-{% extends 'core/purchase_tickets.html' %}
+{% extends 'core/base.html' %}
+{% load static %}
 {% block content %}
-<body style="font-family:Sans">
-  <h2>✅ Purchase Confirmed!</h2>
-  <p>Your ticket(s) were successfully purchased.</p>
-  <a href="{% url 'core:list_raffles' %}">[ Back to Raffle List ]</a>
-</body>
+<div class="container mt-5">
+  <div class="card shadow-lg border-success">
+    <div class="card-body text-center">
+      <h2 class="card-title text-success">Compra Confirmada! ✅</h2>
+      <p class="lead mb-4">Obrigado por participar da rifa <strong>{{ raffle.title }}</strong></p>
+      <div class="mb-3">
+        <h4 class="text-muted">Seus Números da Sorte:</h4>
+        <div class="d-flex flex-wrap justify-content-center">
+          {% for ticket in purchased_tickets %}
+            <span class="badge bg-success text-white m-1 fs-5 shadow-sm">
+              {{ ticket.number|stringformat:"02d" }}
+            </span>
+          {% endfor %}
+        </div>
+      </div>
+	<!-- PIX PAYMENT INFORMATION -->
+<div style="margin-bottom: 1rem; padding: 1rem; border: 1px solid #ccc; border-radius: 10px;">
+  <div class="pix-data text-center">
+    <!-- strong>🔐 Chave PIX (copia e cola)</strong><br>
+    <small style="font-size: 0.85rem;">00020126790014BR.GOV.BCB.PIX0111133014578000242Acao entre amigos To Rifando5204000053039865802BR5920SANDRO REGIS CARDOSO6009SAO PAULO622605227Kk0EBxxrte8FKvzrxCSaU63047121</small -->
+   <!-- PIX Copia e Cola -->
+<div class="mt-3">
+  <strong>🔐 Chave PIX (copia e cola)</strong><br>
+  <input type="text" id="pixCode" class="form-control mt-2 mb-2 text-center" readonly
+         value="00020126790014BR.GOV.BCB.PIX0111133014578000242Acao entre amigos To Rifando5204000053039865802BR5920SANDRO REGIS CARDOSO6009SAO PAULO622605227Kk0EBxxrte8FKvzrxCSaU63047121">
+  <button class="btn btn-outline-success btn-sm" onclick="copyPixCode()">📋 Copiar Código PIX</button>
+  <div id="copyMsg" class="text-success mt-1" style="display: none;">✅ Código copiado!</div>
+</div> 
+    <div class="mt-3">
+      <img class="img img-fluid" src="{% static 'imgs/banks/qr_code_pix_cpf_v2.png' %}" alt="QR Code PIX" style="max-width: 200px; border-radius: 8px;">
+    </div>
+
+    <div class="mt-2">
+      <!-- p class="text-muted">📋 O código será copiado automaticamente ao clicar em <strong>Confirmar</strong></p -->
+      <p class="mb-0">📨 Após sua doação, envie o comprovante para:</p>
+      <p><strong>WhatsApp: (11) 9 4043-3868</strong></p>
+    </div>
+  </div>
+</div>
+	<!-- END -->
+      <a href="{% url 'core:dashboard' %}" class="btn btn-outline-primary mt-4">
+        Voltar para o Painel
+      </a>
+    </div>
+  </div>
+</div>
+<script>
+  function copyPixCode() {
+    const pixInput = document.getElementById("pixCode");
+    const copyMsg = document.getElementById("copyMsg");
+
+    pixInput.select();
+    pixInput.setSelectionRange(0, 99999); // Mobile support
+
+    navigator.clipboard.writeText(pixInput.value)
+      .then(() => {
+        copyMsg.style.display = "block";
+        setTimeout(() => copyMsg.style.display = "none", 3000);
+      })
+      .catch(() => {
+        copyMsg.innerText = "❌ Erro ao copiar.";
+        copyMsg.style.color = "red";
+        copyMsg.style.display = "block";
+      });
+  }
+</script>
 {% endblock %}

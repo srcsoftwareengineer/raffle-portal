@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+  <title>Rifa Violão Rozini 12 Cordas</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- HERO com carrossel + contador -->
+  <header class="hero">
+    <div class="carousel">
+      <img src="imgs/rozini_12c-1.jpeg" alt="Violão Rozini 1" class="active" />
+      <img src="imgs/rozini_12c-2.jpeg" alt="Violão Rozini 2" />
+      <img src="imgs/rozini_12c-3.jpeg" alt="Violão Rozini 3" />
+      <img src="imgs/rozini_12c-4.jpeg" alt="Violão Rozini 4" />
+    </div>
+
+    <!-- Overlay: título + contador + CTA -->
+    <div class="hero-overlay">
+      <div class="hero-text">
+        <h1>🎸 Rifa Violão Rozini 12 Cordas</h1>
+        <p>
+          Participe por apenas <strong>R$19,99</strong> e concorra em
+          <strong>16/08/2025</strong>.
+        </p>
+
+        <!-- Contador regressivo -->
+        <div
+          id="countdown"
+          class="countdown"
+          aria-live="polite"
+          data-target="2025-08-16T20:00:00-03:00"
+          title="Contagem regressiva para o sorteio"
+        >
+          <noscript>Faltam poucos dias para o sorteio!</noscript>
+          <div class="cd-item"><span id="cd-days">--</span><small>dias</small></div>
+          <div class="cd-item"><span id="cd-hours">--</span><small>h</small></div>
+          <div class="cd-item"><span id="cd-mins">--</span><small>min</small></div>
+          <div class="cd-item"><span id="cd-secs">--</span><small>s</small></div>
+        </div>
+
+        <a href="#comprar" class="btn-primary">🎟️ Quero participar</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- DETALHES -->
+  <section class="detalhes">
+    <h2>Detalhes do Prêmio</h2>
+    <ul>
+      <li>Modelo RX415AT – Novo, com Nota Fiscal</li>
+      <li>12 meses de garantia</li>
+      <li>Madeira Louro-Preto, Braço em Cedro</li>
+      <li>Tarraxas blindadas, acabamento impecável</li>
+    </ul>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="cta-final" id="comprar">
+    <h2>Garanta seu número agora!</h2>
+    <a href="https://wa.me/5511940433868" class="btn-whatsapp">
+      📱 Fale com a gente no WhatsApp
+    </a>
+  </section>
+
+  <footer>
+    <p>Rifa do Violão Rozini 12 Cordas - Tô Rifando! © 2025</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
+

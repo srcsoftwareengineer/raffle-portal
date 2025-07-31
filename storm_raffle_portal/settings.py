@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,8 +26,11 @@ SECRET_KEY = "django-insecure-q#jzmne=^*5rc&ero&x&wfuj8)amf1_^9e*h$7&c79@u7s74ca
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "rifas.vocemaislocal.net.br",
+]
 
 # Application definition
 
@@ -38,7 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "widget_tweaks",
-    "core",
+    "core.apps.CoreConfig",
 ]
 
 MIDDLEWARE = [
@@ -52,6 +56,13 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "storm_raffle_portal.urls"
+
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+# STATICFILES_DIRS = [BASE_DIR / 'static']
 
 TEMPLATES = [
     {
@@ -70,6 +81,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "storm_raffle_portal.wsgi.application"
 
+MEDIA_URL = "/media/"
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

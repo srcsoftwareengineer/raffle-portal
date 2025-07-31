@@ -19,7 +19,7 @@ class TicketPurchaseForm(forms.Form):
     def _get_available_tickets(self, raffle: object):
         def fill_tickets_choices():
             self.fields["tickets"].choices = [
-                (t.id, f"Nº {t.number}") for t in available_numbers
+                (t.id, t.number) for t in available_numbers
             ]
 
         def create_tickets():
@@ -40,7 +40,8 @@ class TicketPurchaseForm(forms.Form):
 
     def get_available_tickets(self, raffle: object) -> list:
         self._get_available_tickets(raffle)
-        return self.fields["tickets"].choices
+        available_tickets = {"available_tickets": self.fields["tickets"].choices}
+        return available_tickets
 
     def __init__(self, *args, raffle=None, **kwargs):
         super().__init__(*args, **kwargs)

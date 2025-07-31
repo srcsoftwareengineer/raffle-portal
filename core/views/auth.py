@@ -4,30 +4,51 @@ Created on 15 de jul. de 2025
 @author: masterdev
 """
 
-from django.shortcuts import render
+from django.shortcuts import render, reverse
 from django.shortcuts import redirect
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import login, logout
+from django.contrib.auth import logout
+from core.forms import UserRegistrationForm
+from django.contrib.auth.views import LoginView
+
+
+class CustomLoginView(LoginView):
+    template_name = "registration/login.html"
+
+    def get_success_url(self):
+        return self.get_redirect_url() or reverse("core:user_home")
 
 
 def register(request):
-    """
-    @todo: Add attributes mobile_prefix and mobile_number
-
-    @note: This the mobile_prefix and the last 4 digits of the mobile number will be
-            displayed for public information W.app message will be sent manually
-    """
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
-            return redirect("core:dashboard")
+            # Salva info temporária da sessão para ser usada em algum momento
+            request.session["ddd"] = form.cleaned_data["ddd"]
+            request.session["mobile_number"] = form.cleaned_data["mobile_number"]
+            # Atualiza o perfil com DDD e celular
+            profile = user.userprofile
+            profile.ddd = form.cleaned_data["ddd"]
+            profile.mobile_number = form.cleaned_data["mobile_number"]
+            profile.save()
+            next_url = request.GET.get("next", "")
+            login_url = reverse("core:sign_in")
+            if next_url:
+                login_url += f"?next={next_url}"
+            return redirect(login_url)
+            # return redirect("core:sign_in")
     else:
-        form = UserCreationForm()
-    return render(request, "registration/sign_up.html", {"form": form})
+        form = UserRegistrationForm()
+    return render(request, "core/sign_up.html", {"form": form})
 
 
 def logout_view(request):
+    username = request.user.username
     logout(request)
-    return render(request, "core/logged_out.html")
+    request.session["just_logged_out_user"] = username
+    return render(request, "core/logged_out.html", {"username": username})
+
+
+def logged_out(request):
+    username = request.session.pop("just_logged_out_user", "convidado")
+    return render(request, "core/logged_out.html", {"username": username})

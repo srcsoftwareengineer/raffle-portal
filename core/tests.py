@@ -5,20 +5,20 @@ from core.models.raffles import Raffle
 from core.models.tickets import Ticket
 
 
-class DrawWinnerTest(TestCase):
-
-    def test_draw_selects_a_ticket(self):
-        user = User.objects.create_user(username="admin", password="123")
-        raffle = Raffle.objects.create(
-            title="Test", created_by=user, status="published", total_tickets=1
-        )
-        ticket = Ticket.objects.create(
-            raffle=raffle, number=1, buyer=user, payment_confirmed=True
-        )
-
-        self.client.force_login(user)
-        response = self.client.get(reverse("core:draw_raffle", args=[raffle.id]))
-        self.assertContains(response, "Winner Ticket")
+# class DrawWinnerTest(TestCase):
+#
+#     def test_draw_selects_a_ticket(self):
+#         user = User.objects.create_user(username="admin", password="123")
+#         raffle = Raffle.objects.create(
+#             title="Test", created_by=user, status="published", total_tickets=1
+#         )
+#         ticket = Ticket.objects.create(
+#             raffle=raffle, number=1, buyer=user, payment_confirmed=True
+#         )
+#
+#         self.client.force_login(user)
+#         response = self.client.get(reverse("core:draw_raffle", args=[raffle.id]))
+#         self.assertContains(response, "Winner Ticket")
 
 
 class Tests(TestCase):

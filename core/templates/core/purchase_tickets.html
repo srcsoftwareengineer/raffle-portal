@@ -1,36 +1,130 @@
-<!DOCTYPE html>
-<html>
-	<head>
-	    <title>Purchase Tickets</title>
-	</head>
-	<body style="font-family:Sans;background-color:#390537 !important;text-align:center;color:#ffffff">
-		{% block content %}
-		<h2>Raffle {{ raffle.title }}<br />Purchase your tickets</h2>
-		<div>
-			<div>
-				{% if messages %}
-				<ul>
-				  {% for message in messages %}
-				    <li>{{ message }}</li>
-				  {% endfor %}
-				</ul>
-				{% endif %}
-				</div>
-			<div>
-				<form method="post">
-					{% csrf_token %}
-					{% if raffle.status == "published" %}
-					{{ form.as_p }}
-					{% endif %}
-					<button type="submit">Buy Tickets</button>
-				</form>
-			</div>
-			<div>
-				<a href="{% url 'core:list_raffles' %}"	style="
-				    color: white !important;
-				    text-decoration: blink;">[ Back to list ]</a>
-			</div>
+{% extends 'core/base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<style>
+  #floating-total-bar {
+    position: sticky;
+    top: 80px; /* ajustável conforme seu layout/nav */
+    z-index: 1000;
+    background-color: #e9f7ef;
+    border: 1px solid #b2dfdb;
+    padding: 10px 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+  }
+  .ticket-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .ticket-wrapper {
+    position: relative;
+  }
+
+  .ticket-checkbox {
+    display: none;
+  }
+
+  .ticket-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-weight: bold;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 10px;
+    transition: all 0.3s ease-in-out;
+    border: 2px solid rgba(143,143,147,0.37);
+	color: hwb(0deg 29.8% 67.42%);
+    /* color: #fff;*/
+  }
+
+  /* Cravado (checked) */
+  .ticket-checkbox:checked + .ticket-card {
+    transform: scale(0.96) translateY(2px);
+    box-shadow: inset 2px 2px 8px rgba(0,0,0,0.3);
+    background: rgba(255, 255, 255, 0.05);
+    color: #198754; /* ouro/sorte! */
+    border: 2px solid #0c4b2d9e;
+  }
+  .cb {
+  	margin-bottom: 100px;
+  }
+</style>
+  <div class="container mt-5 cb">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="card-title mb-4">Escolher Números da Rifa</h2>
+		<div id="ticket-alert" class="alert alert-warning d-none" role="alert">
+		  Por favor, selecione pelo menos um ticket para continuar.
 		</div>
-		{% endblock %}
-	</body>
-</html>
+        <form method="post">
+          {% csrf_token %}
+		  <div id="floating-total-bar" class="alert alert-info shadow-sm">
+			<span class="mr-2">
+			  <i class="bi bi-cash-coin"></i> Total: R$ <span id="total-amount">0.00</span>
+			</span>
+		    <!--<strong>Total atual:</strong> R$ 0,00-->
+		  </div>
+          <div class="form-group">
+            <!--<label for="buyer_name">Seu nome:</label>
+            <input type="text" name="buyer_name" id="buyer_name" class="form-control" required>-->
+            <strong>Nome:</strong> {{ request.user.get_full_name|default:request.user.username }}<br>
+            <strong>Contato:</strong> ({{ request.user.userprofile.ddd }}) {{ request.user.userprofile.mobile_number }}
+          </div>
+
+          <div class="form-group mt-4">
+            <label>Selecione os números disponíveis:</label>
+			<div class="ticket-grid">
+			  {% for ticket in form.fields.tickets.choices %}
+			    <div class="ticket-wrapper">
+			      <input type="checkbox" name="tickets" value="{{ ticket.0 }}" id="ticket-{{ ticket.0 }}" class="ticket-checkbox" />
+			      <label for="ticket-{{ ticket.0 }}" class="ticket-card">
+			        {{ ticket.1 }}
+			      </label>
+			    </div>
+			  {% endfor %}
+			</div>
+          </div>
+		  <div class="fixed-bottom bg-light p-3 border-top shadow-sm d-flex justify-content-between align-items-center">
+			  <button type="submit" class="btn btn-success mt-3">Finalizar Compra</button>
+			  <a href="{% url 'core:list_raffles' %}" class="btn btn-secondary mt-3 ml-2">Cancelar</a>
+		  </div>
+          <!--<button type="submit" class="btn btn-primary mt-3">Comprar</button>
+          <a href="{% url 'core:list_raffles' %}" class="btn btn-secondary mt-3 ml-2">Voltar</a>-->
+        </form>
+      </div>
+    </div>
+  </div>
+<!-- JAVASCRIPT SECTION -->
+  <script>
+	const checkboxes = document.querySelectorAll('input[name="tickets"]');
+	  const totalAmount = document.getElementById("total-amount");
+	  const alertBox = document.getElementById("ticket-alert");
+	  const form = document.querySelector("form");
+	  const ticketPrice = {{ raffle.ticket_price|floatformat:2 }};
+
+	  function updateTotal() {
+	    const selected = [...checkboxes].filter(cb => cb.checked);
+	    totalAmount.textContent = (selected.length * ticketPrice).toFixed(2);
+	  }
+	  checkboxes.forEach(cb => cb.addEventListener("change", updateTotal));
+	  form.addEventListener("submit", function (e) {
+	    const selected = [...checkboxes].filter(cb => cb.checked);
+	    if (selected.length === 0) {
+	      e.preventDefault();
+	      alertBox.classList.remove("d-none");
+	      alertBox.scrollIntoView({ behavior: "smooth" });
+	    }
+	  });
+</script>
+{% endblock %}

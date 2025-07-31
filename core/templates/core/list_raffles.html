@@ -1,25 +1,75 @@
 {% extends 'core/base.html' %}
-
+{% load widget_tweaks %}
+{% load custom_filters %}
 {% block content %}
 <div class="text-center mb-4">
   <h2 class="text-primary">🎯 Rifas Disponíveis</h2>
   <p class="text-muted">Participe de rifas incríveis e concorra a prêmios!</p>
 </div>
-
 <div class="row">
   {% for raffle in raffles %}
     <div class="col-md-6 col-lg-4 mb-4">
       <div class="card h-100 border-success shadow">
         <div class="card-body">
           <h5 class="card-title text-success">{{ raffle.title }}</h5>
-          <p class="card-text">{{ raffle.description|truncatechars:100 }}</p>
-          <ul class="list-group list-group-flush mb-2">
-            <li class="list-group-item">🎟️ Tickets: {{ raffle.total_tickets }}</li>
-            <li class="list-group-item">💰 Preço: R$ {{ raffle.ticket_price }}</li>
+		  {# Exibe os tickets do usuário se estiverem disponíveis para essa rifa #}
+		  {% if user_tickets_map and raffle.id in user_tickets_map %}
+			<p>
+			  <strong>🎟️ Seus Números:</strong>
+			  {% for ticket in user_tickets_map|dict_get:raffle.id %}
+				{{ ticket.number }}{% if not forloop.last %}, {% endif %}
+			  {% empty %}
+				Nenhum ticket comprado ainda.
+			  {% endfor %}
+			</p>
+          {% endif %}
+          {# Carousel de imagens #}
+          {% if raffle.images.all %}
+            <div id="carouselRaffle{{ raffle.id }}" class="carousel slide mb-3" data-ride="carousel">
+              <div class="carousel-inner">
+                {% for image in raffle.images.all %}
+                  <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <img src="{{ image.image.url }}" class="d-block w-100 rounded shadow-sm" alt="Imagem da Rifa {{ raffle.title }}">
+                  </div>
+                {% endfor %}
+              </div>
+              <a class="carousel-control-prev" href="#carouselRaffle{{ raffle.id }}" role="button" data-slide="prev">
+                <i class="bi bi-chevron-left fs-1 text-dark"></i>
+              </a>
+              <a class="carousel-control-next" href="#carouselRaffle{{ raffle.id }}" role="button" data-slide="next">
+                <i class="bi bi-chevron-right fs-1 text-dark"></i>
+              </a>
+            </div>
+          {% endif %}
+          {# Descrição Expandível #}
+          <div class="raffle-description-container mb-3" style="text-align:left;">
+            <p class="card-text raffle-description short" id="desc-{{ raffle.id }}">
+              {{ raffle.description|linebreaksbr }}
+            </p>
+            <a href="javascript:void(0);" class="toggle-desc-link text-primary fw-bold" onclick="toggleDescription({{ raffle.id }})">
+              Ver descrição completa
+            </a>
+          </div>
+          <ul class="list-group list-group-flush mb-2" style="text-align:left;">
+			<li class="list-group-item">🎟 Tickets: {{ available_tickets }}</li>
+			<li class="list-group-item">💰 Preço: R$ {{ raffle.ticket_price }}</li>
             <li class="list-group-item">📅 Sorteio: {{ raffle.draw_date|date:"d/m/Y" }}</li>
+            {% if user.is_staff %}
+              <span class="badge badge-info">{{ raffle.status }}</span>
+            {% endif %}
+            {% if raffle.status == "draft" and user == raffle.created_by %}
+              <a href="{% url 'core:publish_raffle' raffle.id %}" class="btn btn-sm btn-warning">Publicar</a>
+            {% endif %}
           </ul>
+          {% if raffle.status != "published" %}
+            <div class="alert alert-danger mt-3">
+              Sua rifa não está visível para visitantes comprarem!
+            </div>
+          {% endif %}
           <div class="d-grid gap-2">
-            <a href="{% url 'core:purchase_tickets' raffle.id %}" class="btn btn-outline-success">Participar</a>
+            <a href="{% url 'core:sign_in' %}?next={% url 'core:purchase_tickets' raffle.id %}" class="btn btn-primary">
+				Participar
+			</a>
             {% if user.is_staff %}
               <a href="{% url 'core:draw_raffle' raffle.id %}" class="btn btn-outline-warning">Sortear</a>
             {% endif %}
@@ -35,4 +85,35 @@
     </div>
   {% endfor %}
 </div>
+<style>
+.raffle-description.short {
+  max-height: 3.6em; /* ~2 linhas */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.raffle-description.expanded {
+  max-height: none;
+  -webkit-line-clamp: unset;
+}
+</style>
+<script>
+function toggleDescription(raffleId) {
+  const desc = document.getElementById("desc-" + raffleId);
+  const link = desc.nextElementSibling;
+  if (desc.classList.contains("short")) {
+    desc.classList.remove("short");
+    desc.classList.add("expanded");
+    link.textContent = "Ver menos";
+  } else {
+    desc.classList.add("short");
+    desc.classList.remove("expanded");
+    link.textContent = "Ver descrição completa";
+  }
+}
+</script>
 {% endblock %}
+

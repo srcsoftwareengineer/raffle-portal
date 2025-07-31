@@ -1,6 +1,18 @@
-<!--{% block content %}-->
-<h2>Logged out!</h2>
-<p>Volte sempre, {{ request.user.username|default:"convidado" }} 😉</p>
-<p><a href="{% url 'core:sign_in' %}">Log in again</a></p>
-<p><a href="{% url 'core:dashboard' %}">Back to Dashboard</a></p>
-<!--{% endblock %}-->
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <div class="alert alert-success text-center">
+    <h3>Você desconectou com sucesso 🍀</h3>
+    <p>Volte sempre, {{ username|default:"convidado" }} 😉</p>
+    <hr>
+    <p>
+      Compartilhe com seus amigos, amigas e familiares!<br>
+      <strong>A cada 10 novos participantes, você ganha:</strong><br>
+      💰 Bônus em novas rifas<br/>
+      <!-- 📣 Sua rifa em destaque 3x por 3 dias! -->
+    </p>
+	<a href="{% url 'core:index' %}" class="btn btn-primary mt-3" style="margin-right:23px;">Início</a>
+    <a href="{% url 'core:sign_in' %}" class="btn btn-warning mt-3">Fazer login novamente</a>
+  </div>
+</div>
+{% endblock %}

@@ -56,3 +56,5 @@ Thumbs.db
 /.gitignore~
 **/*/*.py~
 /_samples/
+/create_tar_file.sh
+/_aws/
