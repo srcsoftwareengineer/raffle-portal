@@ -4,6 +4,35 @@
 
 ---
 
+## [v0.1.0] - 2025-07-31
+
+🎯 Initial MVP completed after a focused 13-day sprint.
+
+### Added
+- Public listing of raffles (unauthenticated access)
+- User auth: sign-up, login, logout
+- Ticket purchase flow with Pix payment info
+- Admin interface to confirm payments and draw winners
+- Creator-only restriction on raffle drawing
+- User dashboard with participated raffles
+- Pre-commit validation and test execution
+
+### Improved
+- UX flows and interface consistency
+- Admin panel with raffle/ticket management
+- Code structure and module separation
+
+---
+
+## [Upcoming]
+
+### Planned
+- QR code Pix integration
+- Automated payment confirmation
+- Marketing campaign module
+- Enhanced mobile experience
+
+---
 ## [0.1.0] – 2025-07-25
 ### 🎬 MVP lançado com sucesso (Locked in Adamantium)
 
