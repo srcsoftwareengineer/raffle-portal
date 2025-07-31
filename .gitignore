@@ -58,3 +58,9 @@ Thumbs.db
 /_samples/
 /create_tar_file.sh
 /_aws/
+.idea/
+*.log
+.project
+.pydevproject
+dev.db.raffles
+.github/
