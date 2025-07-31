@@ -55,4 +55,6 @@ Inspirado pela experiência real de empreender, StormRaffle foi criado com base 
 ## 🚀 Deploy
 
 > Ambiente de produção já definido:
-
+- Create superuser: python manage.py createsuperuser
+- Admin panel:
+- URL: /admin/
