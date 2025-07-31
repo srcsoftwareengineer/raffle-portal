@@ -1,4 +1,4 @@
-# 📦 CHANGELOG – StormRaffle
+# 📦 CHANGELOG – Tô Rifando - Portal de Rifas Online
 
 > Todas as mudanças notáveis do projeto são documentadas neste arquivo.
 
