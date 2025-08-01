@@ -1,12 +1,16 @@
-from django.contrib import admin
-from core.models.winners import WinnerNotification
-from core.models.tickets import Ticket
-from core.models.raffles import Raffle
+from django.contrib import admin, messages
 from django.utils.html import format_html
 from django.urls import path
 from django.shortcuts import redirect, get_object_or_404
-from django.utils.timezone import now
 from django.db import transaction
+from django.conf import settings
+from core.models.winners import WinnerNotification
+from core.models.tickets import Ticket
+from core.models.raffles import Raffle
+from django.contrib.auth.models import User
+
+# from django.contrib.auth import get_user_model
+# from django.utils.timezone import now
 
 
 # -----------------------------
@@ -28,7 +32,6 @@ class RaffleAdmin(admin.ModelAdmin):
     save_on_top = True
     list_per_page = 25
 
-    # Listagem principal
     list_display = (
         "id",
         "title",
@@ -38,19 +41,16 @@ class RaffleAdmin(admin.ModelAdmin):
         "total_tickets",
         "tickets_sold",
         "create_date",
-        "publish_button",
+        "action_buttons",
+        "winner_badge",
     )
     list_filter = ("status", "draw_date", "create_date")
     search_fields = ("title",)
     ordering = ("-create_date",)
-
-    # Permitir edição rápida de alguns campos direto da listagem
     list_editable = (
         "draw_date",
         "ticket_price",
     )
-
-    # Fieldsets
     fieldsets = (
         ("Dados gerais", {"fields": ("title", "description", "status")}),
         (
@@ -65,108 +65,84 @@ class RaffleAdmin(admin.ModelAdmin):
             },
         ),
     )
-
     readonly_fields = ("create_date", "drawn_at", "created_by", "drawn_ticket")
-
     inlines = [TicketInline]
+    actions = (
+        "action_publish",
+        "action_unpublish",
+        "action_close",
+        "action_generate_tickets",
+    )
 
-    # Ações em massa
-    actions = ("action_publish", "action_unpublish", "action_close")
+    # --- garante created_by sem default=1 ---
+    def save_model(self, request, obj, form, change):
+        if not change and not obj.created_by_id:
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)
 
-    # Badge de status colorida
+    # --- colunas auxiliares (como já estavam) ---
     @admin.display(description="Status")
     def status_badge(self, obj):
-        color_map = {
-            "draft": "#956106",  # âmbar
-            "published": "#0a7d2c",  # verde
-            "closed": "#7d0a0a",  # vermelho
-        }
+        color_map = {"draft": "#956106", "published": "#0a7d2c", "closed": "#7d0a0a"}
         return format_html(
-            '<span style="padding:2px 8px; border-radius:12px; color:#fff; background:{};">{}</span>',
+            '<span style="padding:2px 8px;border-radius:12px;color:#fff;background:{};">{}</span>',
             color_map.get(obj.status, "#555"),
             obj.get_status_display(),
         )
 
-    # Contador de tickets vendidos
     @admin.display(description="Tickets vendidos")
     def tickets_sold(self, obj):
         return obj.tickets.filter(payment_confirmed=True).count()
 
-    # Botão de publicar na listagem
-    @admin.display(description="Publicar")
-    def publish_button(self, obj):
-        if obj.status == "draft":
+    @admin.display(description="Vencedor")
+    def winner_badge(self, obj):
+        if obj.drawn_ticket_id:
+            t = obj.drawn_ticket
+            buyer = t.buyer.username if t.buyer else "—"
             return format_html(
-                '<a class="button" href="{}">Publicar</a>', f"./{obj.pk}/publish/"
+                '<span style="padding:2px 8px;border-radius:12px;background:#1f2937;color:#fff;">#{} · {}</span>',
+                t.number,
+                buyer,
             )
         return "—"
 
-    # Custom URLs (para botão "Publicar")
-    def get_urls(self):
-        urls = super().get_urls()
-        custom = [
-            path(
-                "<int:pk>/publish/",
-                self.admin_site.admin_view(self.view_publish),
-                name="raffle_publish",
-            ),
-        ]
-        return custom + urls
-
-    @transaction.atomic
-    def view_publish(self, request, pk):
-        raffle = get_object_or_404(Raffle, pk=pk)
-        try:
-            if raffle.total_tickets <= 0:
-                raise ValueError("Defina um número de bilhetes maior que zero.")
-            raffle.status = "published"
-            raffle.drawn_at = None
-            raffle.save()
-            self.message_user(
-                request, "Rifa publicada com sucesso!", level=messages.SUCCESS
-            )
-        except Exception as e:
-            self.message_user(request, f"Erro ao publicar: {e}", level=messages.ERROR)
-        return redirect(f"../../{pk}/change/")
-
-    # Ações em massa
-    @admin.action(description="Publicar rifas selecionadas")
-    def action_publish(self, request, queryset):
-        queryset.update(status="published")
-        self.message_user(
-            request, "Rifas publicadas com sucesso.", level=messages.SUCCESS
-        )
-
-    @admin.action(description="Mover rifas selecionadas para rascunho")
-    def action_unpublish(self, request, queryset):
-        queryset.update(status="draft")
-        self.message_user(
-            request, "Rifas movidas para rascunho.", level=messages.SUCCESS
-        )
-
-    @admin.action(description="Encerrar rifas selecionadas")
-    def action_close(self, request, queryset):
-        queryset.update(status="closed")
-        self.message_user(request, "Rifas encerradas.", level=messages.SUCCESS)
-
-    # ... resto do código permanece igual ...
-
-    # Botão de publicar / encerrar na listagem
     @admin.display(description="Ações")
-    def publish_button(self, obj):
+    def action_buttons(self, obj):
+        buttons = []
+        # Publicar / Encerrar / Sortear (como já estavam)
         if obj.status == "draft":
-            return format_html(
-                '<a class="button" href="{}" style="margin-right:5px;">Publicar</a>',
-                f"./{obj.pk}/publish/",
+            buttons.append(
+                f'<a class="button" href="./{obj.pk}/publish/" style="margin-right:6px;">Publicar</a>'
             )
-        elif obj.status == "published":
-            return format_html(
-                '<a class="button" style="background:#b91c1c;color:white;" href="{}">Encerrar vendas</a>',
-                f"./{obj.pk}/close/",
+        if obj.status == "published":
+            buttons.append(
+                f'<a class="button" href="./{obj.pk}/close/" style="margin-right:6px;background:#b91c1c;color:white;">Encerrar</a>'
             )
-        return "—"
+            if obj.tickets.filter(payment_confirmed=True).exists():
+                buttons.append(
+                    f'<a class="button" href="./{obj.pk}/draw/" style="margin-right:6px;background:#0ea5e9;color:white;">Sortear</a>'
+                )
+                buttons.append(
+                    f'<a class="button" href="./{obj.pk}/close_and_draw/" style="background:#0d9488;color:white;">Encerrar + Sortear</a>'
+                )
 
-    # URLs customizadas (adiciona rota /publish/ e /close/)
+        # 👉 NOVO: Gerar tickets e Arrematar restantes
+        # mostra “Gerar tickets” se faltarem números
+        existing = obj.tickets.count()
+        if existing < obj.total_tickets:
+            buttons.append(
+                f'<a class="button" href="./{obj.pk}/generate_tickets/" style="margin-left:6px;background:#4f46e5;color:white;">Gerar tickets</a>'
+            )
+
+        # “Arrematar restantes” aparece se houver não pagos
+        if obj.tickets.filter(payment_confirmed=False).exists():
+            buttons.append(
+                f'<a class="button" href="./{obj.pk}/buy_remaining/" style="margin-left:6px;background:#7c3aed;color:white;">Arrematar restantes</a>'
+            )
+
+        return format_html("".join(buttons)) if buttons else "—"
+
+    # --- URLs customizadas ---
     def get_urls(self):
         urls = super().get_urls()
         custom = [
@@ -180,39 +156,107 @@ class RaffleAdmin(admin.ModelAdmin):
                 self.admin_site.admin_view(self.view_close),
                 name="raffle_close",
             ),
+            path(
+                "<int:pk>/draw/",
+                self.admin_site.admin_view(self.view_draw),
+                name="raffle_draw",
+            ),
+            path(
+                "<int:pk>/close_and_draw/",
+                self.admin_site.admin_view(self.view_close_and_draw),
+                name="raffle_close_draw",
+            ),
+            # 👉 NOVOS
+            path(
+                "<int:pk>/generate_tickets/",
+                self.admin_site.admin_view(self.view_generate_tickets),
+                name="raffle_generate_tickets",
+            ),
+            path(
+                "<int:pk>/buy_remaining/",
+                self.admin_site.admin_view(self.view_buy_remaining),
+                name="raffle_buy_remaining",
+            ),
         ]
         return custom + urls
 
+    # --- Handlers existentes (publish/close/draw/close_and_draw) continuam os teus ---
+    # 👉 NOVO: gerar tickets faltantes
     @transaction.atomic
-    def view_publish(self, request, pk):
-        raffle = get_object_or_404(Raffle, pk=pk)
+    def view_generate_tickets(self, request, pk):
+        raffle = get_object_or_404(Raffle.objects.select_for_update(), pk=pk)
         try:
-            if raffle.total_tickets <= 0:
-                raise ValueError("Defina um número de bilhetes maior que zero.")
-            raffle.status = "published"
-            raffle.drawn_at = None
-            raffle.save()
-            self.message_user(
-                request, "Rifa publicada com sucesso!", level=messages.SUCCESS
-            )
+            before = raffle.tickets.count()
+            raffle.generate_missing_tickets()
+            created = raffle.tickets.count() - before
+            if created > 0:
+                self.message_user(
+                    request, f"{created} ticket(s) gerado(s).", level=messages.SUCCESS
+                )
+            else:
+                self.message_user(
+                    request,
+                    "Nenhum ticket novo precisava ser gerado.",
+                    level=messages.INFO,
+                )
         except Exception as e:
-            self.message_user(request, f"Erro ao publicar: {e}", level=messages.ERROR)
+            self.message_user(
+                request, f"Erro ao gerar tickets: {e}", level=messages.ERROR
+            )
         return redirect(f"../../{pk}/change/")
 
+    # 👉 NOVO: arrematar restantes (firma)
     @transaction.atomic
-    def view_close(self, request, pk):
-        raffle = get_object_or_404(Raffle, pk=pk)
+    def view_buy_remaining(self, request, pk):
+        raffle = get_object_or_404(Raffle.objects.select_for_update(), pk=pk)
         try:
-            if raffle.status != "published":
-                raise ValueError("Apenas rifas publicadas podem ser encerradas.")
-            raffle.status = "closed"
-            raffle.save()
-            self.message_user(
-                request, "Rifa encerrada com sucesso!", level=messages.SUCCESS
+            # defina o comprador "firma"
+            firm_user_id = getattr(settings, "FIRM_USER_ID", None)
+            if not firm_user_id:
+                raise ValueError(
+                    "Configure settings.FIRM_USER_ID com o ID do usuário 'firma'."
+                )
+            buyer = get_object_or_404(User, pk=firm_user_id)
+
+            count = raffle.buy_remaining(
+                buyer=buyer, confirm_payment=True, reserve=False
             )
+            if count:
+                self.message_user(
+                    request,
+                    f"{count} ticket(s) arrematado(s) pela firma.",
+                    level=messages.SUCCESS,
+                )
+            else:
+                self.message_user(
+                    request,
+                    "Não há tickets restantes para arrematar.",
+                    level=messages.INFO,
+                )
         except Exception as e:
-            self.message_user(request, f"Erro ao encerrar: {e}", level=messages.ERROR)
+            self.message_user(
+                request, f"Erro ao arrematar restantes: {e}", level=messages.ERROR
+            )
         return redirect(f"../../{pk}/change/")
+
+    # --- Ações em massa úteis ---
+    @admin.action(description="Gerar tickets (faltantes)")
+    def action_generate_tickets(self, request, queryset):
+        total_created = 0
+        for raffle in queryset:
+            before = raffle.tickets.count()
+            raffle.generate_missing_tickets()
+            total_created += raffle.tickets.count() - before
+        if total_created:
+            self.message_user(
+                request,
+                f"{total_created} ticket(s) gerado(s) ao todo.",
+                level=messages.SUCCESS,
+            )
+        else:
+            self.message_user(
+                request, "Nenhum ticket novo precisava ser gerado.", level=messages.INFO
+            )
 
 
 # -----------------------------
