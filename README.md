@@ -1,60 +1,63 @@
-# Tô Rifando – Portal de Rifas Online [![GitHub Release](https://img.shields.io/github/v/release/srcsoftwareengineer/raffle-portal?label=Release&style=flat-square)](https://github.com/srcsoftwareengineer/raffle-portal/releases/latest)
+# Tô Rifando – Online Raffle Portal [![GitHub Release](https://img.shields.io/github/v/release/srcsoftwareengineer/raffle-portal?label=Release&style=flat-square)](https://github.com/srcsoftwareengineer/raffle-portal/releases/latest)
 
-> Versão: **MVP 0.1 - Locked in Adamantium**  
-> Data de Lançamento: `27/07/2025`
+🌎 English Version | [🇧🇷 Versão em Português](./README-pt.md)
+
+> Version: **MVP 0.1 – Locked in Adamantium**  
+> Release Date: `2025-07-27`
 ---
 
-## 🌪️ Visão Geral
+## 🌪️ Overview
 
-**StormRaffle** é um sistema completo para gerenciamento de rifas online. Desenvolvido como um MVP robusto, o projeto entrega um ciclo completo: criação de rifas, upload de imagens, venda de bilhetes, sorteio e notificação de ganhadores.
+**StormRaffle** is a complete system for managing online raffles.  
+Developed as a robust MVP, the project delivers the full cycle: raffle creation, image uploads, ticket sales, drawing, and winner notification.
 
-Inspirado pela experiência real de empreender, StormRaffle foi criado com base em práticas sólidas de engenharia de software, princípios MVP e pronto para escalar como **SaaS**.
+Inspired by real entrepreneurial experience, StormRaffle was built on solid software engineering practices, MVP principles, and is ready to scale as a **SaaS platform**.
 
 ---
 
-## ✅ Funcionalidades Entregues
+## ✅ Delivered Features
 
-### 🔐 Autenticação e Perfis
-- Registro com campos personalizados: DDD e celular
-- Criação automática de perfil com `signals.py`
-- Validações e mensagens amigáveis
+### 🔐 Authentication & Profiles
+- Registration with custom fields: area code (DDD) and mobile number  
+- Automatic profile creation with `signals.py`  
+- Validations and user-friendly messages  
 
-### 🎟️ Rifas
-- Criação de rifas com múltiplas imagens
-- Upload e armazenamento seguro em `/media/raffle_images/`
-- Slideshow cinematográfico (Bootstrap Carousel)
+### 🎟️ Raffles
+- Create raffles with multiple images  
+- Upload and secure storage in `/media/raffle_images/`  
+- Cinematic slideshow (Bootstrap Carousel)  
 
-### 🛒 Compra de Bilhetes
-- Interface intuitiva para escolher e comprar números
-- Feedback visual dos bilhetes comprados
-- Integração com status de pagamento
+### 🛒 Ticket Purchase
+- Intuitive interface to choose and purchase numbers  
+- Visual feedback for purchased tickets  
+- Integration with payment status  
 
-### 🎉 Sorteio
-- Painel administrativo para sortear vencedores
-- Registro da data e do bilhete vencedor
-- Mensagem amigável de ganhador
+### 🎉 Drawing
+- Admin panel to draw winners  
+- Stores the date and winning ticket number  
+- Friendly winner message  
 
 ### 📢 Admin & UX
-- Status inteligente das rifas: draft / published / closed
-- Botões de ação rápida: publicar, sortear
-- Aviso para rifas não publicadas
-- Mensagens com tom emocional e motivacional
+- Smart raffle status: draft / published / closed  
+- Quick action buttons: publish, draw  
+- Warning for unpublished raffles  
+- Motivational and emotional tone in messages  
 
 ---
 
 ## 💡 Tech Stack
 
-- **Backend**: Django 4+
-- **Frontend**: Bootstrap 4, HTML5
-- **Banco de Dados**: SQLite (MVP), pronto para PostgreSQL
-- **Auth & Perfis**: Django Auth + UserProfile (DDD, celular)
-- **Arquivos**: Upload para FileSystem `/media/`
+- **Backend**: Django 4+  
+- **Frontend**: Bootstrap 4, HTML5  
+- **Database**: SQLite (MVP), ready for PostgreSQL  
+- **Auth & Profiles**: Django Auth + UserProfile (area code, mobile)  
+- **Files**: Upload to FileSystem `/media/`  
 
 ---
 
 ## 🚀 Deploy
 
-> Ambiente de produção já definido:
-- Create superuser: python manage.py createsuperuser
-- Admin panel:
-- URL: /admin/
+> Production environment already defined:  
+- Create superuser: `python manage.py createsuperuser`  
+- Admin panel:  
+- URL: `/admin/`
