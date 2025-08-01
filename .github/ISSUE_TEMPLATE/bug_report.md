@@ -1,3 +1,10 @@
+---
+name: Bug Report
+about: Report a bug or CI failure
+title: "[BUG]"
+labels: bug
+---
+
 ## 🐞 Bug Report
 
 ### 📖 Description
